@@ -8,7 +8,10 @@ import busio
 import adafruit_esp32spi.adafruit_esp32spi_socket as socket
 from adafruit_esp32spi import adafruit_esp32spi
 import adafruit_requests as requests
+import os
 import time
+import digitalio
+import storage
 
 
 
@@ -46,15 +49,14 @@ def main():
 
     while True:
 
-        response = requests.get("https://pi-screen.herokuapp.com/currentAlbum").text
-
-
-        if response == current_album_title:
-            # wait and continue with next loop, nothing new needs to be rendered.
-            print("nothing to change")
-            time.sleep(5)
-            continue
-        elif user_is_listening_to_song():
+        if user_is_listening_to_song() == True:
+            
+            response = requests.get("https://pi-screen.herokuapp.com/currentAlbum").text
+            
+            if response == current_album_title:
+                print("nothing to change")
+                time.sleep(5)
+                continue
             # render the board with the artwork as an argument.
             print("Fetching album artwork")
             r = requests.get("https://pi-screen.herokuapp.com/")
@@ -67,15 +69,19 @@ def main():
 
         else:
             # render the board with the placeholder as an argument
+            if current_album_title == "placeholder":
+                print("nothing to change")
+                time.sleep(5)
+                continue
             print("rendering placeholder")
+            current_album_title = "placeholder"
             render_board_with_artwork("/placeholder.bmp")
 
     return
 
 def user_is_listening_to_song():
     response = requests.get("https://pi-screen.herokuapp.com/currentAlbum")
-
-    return False if response.text == "no song is playing" else True
+    return False if response.status_code == 500 else True
 
 def get_new_album_title():
     response = requests.get("https://pi-screen.herokuapp.com/currentAlbum")
