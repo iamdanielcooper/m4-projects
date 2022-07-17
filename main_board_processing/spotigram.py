@@ -4,10 +4,10 @@ import adafruit_imageload
 import displayio
 import time
 
-count = 0
+current_album_title = ""
 
 def get_album_artwork():
-    current_album_title = ""
+    global current_album_title
     current_album_title_url = "https://pi-screen.herokuapp.com/currentAlbum"
     get_current_album_artwork_url = "https://pi-screen.herokuapp.com/"
 
@@ -18,7 +18,7 @@ def get_album_artwork():
         if response == current_album_title:
             print("nothing to change")
             time.sleep(5)
-            return render_board_with_artwork("/art.bmp")
+            return None
         # render the board with the artwork as an argument.
         print("Fetching album artwork")
         r = requests.get("https://pi-screen.herokuapp.com/")
@@ -35,7 +35,7 @@ def get_album_artwork():
         if current_album_title == "placeholder":
             print("nothing to change")
             time.sleep(5)
-            return render_board_with_artwork("/placeholder.bmp")
+            return None
         print("rendering placeholder")
         r = requests.get("https://pi-screen.herokuapp.com/instagram")
         current_album_title = "placeholder"
@@ -69,9 +69,9 @@ def render_board_with_artwork(file_location):
                                      x=0, y=0)
 
     group = displayio.Group()
+
     group.append(image_grid)
 
 
     print(group)
     return group
-

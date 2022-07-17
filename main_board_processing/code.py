@@ -14,7 +14,7 @@ def main():
 
     display = get_matrix_display()
     display_image = None
-    
+
     connect_to_wifi()
 
     # modes: {"CLOCK", "INSTAGRAM", "TFL", "FLIGHTS"}
@@ -22,7 +22,6 @@ def main():
 
     count = 0
     while True:
-
         # Request an API & get the current state
         # If the mode has been updated, update the mode state of the app. This will determine which route below is called.
 
@@ -30,8 +29,12 @@ def main():
             display_image = blue_square.say_hello()
         else:
             display_image = spotigram.get_album_artwork()
-
         count += 1
+
+
+        print(display_image)
+        if display_image == None:
+            continue
 
         display.show(display_image)
 
@@ -39,7 +42,7 @@ def main():
 def get_matrix_display():
     matrix = Matrix(width=32, height=32, bit_depth=6)
     return matrix.display
-    
+
 def connect_to_wifi():
     esp32_cs = DigitalInOut(board.ESP_CS)
     esp32_ready = DigitalInOut(board.ESP_BUSY)
