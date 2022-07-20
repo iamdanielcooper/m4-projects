@@ -8,7 +8,7 @@ current_album_title = ""
 
 def get_album_artwork():
     global current_album_title
-    current_album_title_url = "https://pi-screen.herokuapp.com/currentAlbum"
+    get_current_album_title_url = "https://pi-screen.herokuapp.com/currentAlbum"
     get_current_album_artwork_url = "https://pi-screen.herokuapp.com/"
 
     if user_is_listening_to_song() == True:
@@ -20,15 +20,20 @@ def get_album_artwork():
             time.sleep(5)
             return None
         # render the board with the artwork as an argument.
-        print("Fetching album artwork")
-        r = requests.get("https://pi-screen.herokuapp.com/")
+        else:
+            try:
+                print("Fetching album artwork")
+                r = requests.get("https://pi-screen.herokuapp.com/")
 
-        with open("art.bmp", 'wb') as handler:
-            handler.write(r.content)
+                with open("art.bmp", 'wb') as handler:
+                    handler.write(r.content)
 
-        current_album_title = get_new_album_title()
+                current_album_title = get_new_album_title()
 
-        return render_board_with_artwork("/art.bmp")
+                return get_artwork_group("/art.bmp")
+            except:
+                # Return the placeholder
+                return get_artwork_group("/art.bmp")
 
     else:
         # render the board with the placeholder as an argument
@@ -38,11 +43,13 @@ def get_album_artwork():
             return None
         print("rendering placeholder")
         r = requests.get("https://pi-screen.herokuapp.com/instagram")
+        
         current_album_title = "placeholder"
         with open("placeholder.bmp", 'wb') as handler:
             handler.write(r.content)
 
-        return render_board_with_artwork("/placeholder.bmp")
+        # TODO - Investigate why placeholder is failing.
+        return get_artwork_group("/fallback.bmp")
 
     return
 
@@ -55,7 +62,7 @@ def get_new_album_title():
 
     return response.text
 
-def render_board_with_artwork(file_location):
+def get_artwork_group(file_location):
     image_bit, image_pal = adafruit_imageload.load(file_location,
                                                      bitmap=displayio.Bitmap,
                                                      palette=displayio.Palette)
