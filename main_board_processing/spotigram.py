@@ -43,13 +43,18 @@ def get_album_artwork():
             return None
         print("rendering placeholder")
         r = requests.get("https://pi-screen.herokuapp.com/instagram")
-        
+
         current_album_title = "placeholder"
         with open("placeholder.bmp", 'wb') as handler:
             handler.write(r.content)
 
-        # TODO - Investigate why placeholder is failing.
-        return get_artwork_group("/fallback.bmp")
+
+        try:
+            group = get_artwork_group("/placeholder.bmp")
+            return group
+        except RuntimeError:
+            group = get_artwork_group("/fallback.bmp")
+            return group
 
     return
 
@@ -82,3 +87,4 @@ def get_artwork_group(file_location):
 
     print(group)
     return group
+ 
